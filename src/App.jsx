@@ -4,8 +4,8 @@ import bgm from "./assets/bgm.mp3";
 import bg from "./assets/cg.jpg";
 
 function App() {
+  const [currentPage, setCurrentPage] = useState("menu"); // menu/start/continue/etc
   const [lineIndex, setLineIndex] = useState(0);
-  const [currentPage, setCurrentPage] = useState("menu"); // menu | start | continue | extra | system | trueEnd | exit
   const audioRef = useRef(null);
 
   const lines = [
@@ -25,14 +25,47 @@ function App() {
   };
 
   const menuItems = [
-    { name: "TRUE END", key: "trueEnd" },
-    { name: "CONTINUE", key: "continue" },
     { name: "START", key: "start" },
-    { name: "LOAD", key: "load" },
-    { name: "SYSTEM", key: "system" },
+    { name: "CONTINUE", key: "continue" },
     { name: "EXTRA", key: "extra" },
+    { name: "SYSTEM", key: "system" },
+    { name: "TRUE END", key: "trueEnd" },
     { name: "EXIT", key: "exit" },
   ];
+
+  const renderMenu = () => (
+    <div style={{
+      position: "fixed",
+      left: "140px",
+      top: "250px",
+      display: "flex",
+      flexDirection: "column",
+      gap: "24px",
+      zIndex: 20
+    }}>
+      {menuItems.map(item => (
+        <button
+          key={item.key}
+          onClick={() => setCurrentPage(item.key)}
+          style={{
+            width: "260px",
+            fontSize: "32px",
+            color: "#ffffff",
+            textAlign: "left",
+            fontWeight: "bold",
+            background: "rgba(0,0,0,0.3)",
+            border: "2px solid #ffffff",
+            borderRadius: "8px",
+            padding: "12px 16px",
+            cursor: "pointer",
+            textShadow: "0 0 6px rgba(0,0,0,0.6)"
+          }}
+        >
+          {item.name}
+        </button>
+      ))}
+    </div>
+  );
 
   const renderContent = () => {
     switch (currentPage) {
@@ -45,17 +78,17 @@ function App() {
           </div>
         );
       case "continue":
-        return <div style={placeholderStyle}>加载存档页面（CONTINUE）</div>;
+        return <div style={placeholderStyle}>存档界面（CONTINUE）</div>;
       case "extra":
-        return <div style={placeholderStyle}>CG / Extra 内容展示</div>;
+        return <div style={placeholderStyle}>CG / EXTRA 内容</div>;
       case "system":
         return <div style={placeholderStyle}>设置界面（SYSTEM）</div>;
       case "trueEnd":
-        return <div style={placeholderStyle}>游戏真结局（TRUE END）</div>;
+        return <div style={placeholderStyle}>真结局（TRUE END）</div>;
       case "exit":
         return <div style={placeholderStyle}>退出页面（EXIT）</div>;
       default:
-        return <div style={placeholderStyle}>点击菜单选项查看内容</div>;
+        return renderMenu();
     }
   };
 
@@ -69,102 +102,57 @@ function App() {
           backgroundImage: `url(${bg})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          filter: "brightness(0.75) saturate(1.05)",
+          filter: "brightness(0.75) saturate(1.05)"
         }}
       />
-
-      {/* 渐变遮罩 */}
       <div
         style={{
           position: "fixed",
           inset: 0,
-          background:
-            "linear-gradient(to top, rgba(0,20,40,0.65), transparent)",
+          background: "linear-gradient(to top, rgba(0,20,40,0.65), transparent)"
         }}
       />
 
       {/* Logo */}
-      <div
-        style={{
-          position: "fixed",
-          left: "120px",
-          top: "80px",
-          color: "white",
-          fontSize: "52px",
-          fontWeight: "bold",
-          textShadow: "0 4px 20px rgba(255,255,255,0.35)",
-          zIndex: 20,
-        }}
-      >
+      <div style={{
+        position: "fixed",
+        left: "120px",
+        top: "80px",
+        color: "white",
+        fontSize: "52px",
+        fontWeight: "bold",
+        textShadow: "0 4px 20px rgba(255,255,255,0.35)",
+        zIndex: 20
+      }}>
         ATRI
-        <div style={{ fontSize: "20px", opacity: 0.9 }}>
-          - My Dear Moments -
-        </div>
+        <div style={{ fontSize: "20px", opacity: 0.9 }}>- My Dear Moments -</div>
       </div>
 
       {/* Avatar */}
-      <img
-        src={avatar}
-        alt="avatar"
-        style={{
-          position: "fixed",
-          right: "40px",
-          top: "30px",
-          width: "90px",
-          height: "90px",
-          borderRadius: "50%",
-          border: "3px solid white",
-          boxShadow: "0 10px 30px rgba(0,0,0,.35)",
-          zIndex: 20,
-        }}
-      />
-
-      {/* 菜单 */}
-      <div
-        style={{
-          position: "fixed",
-          left: "140px",
-          top: "300px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "10px",
-          zIndex: 20,
-        }}
-      >
-        {menuItems.map((item) => (
-          <button
-            key={item.key}
-            onClick={() => setCurrentPage(item.key)}
-            style={{
-              width: "240px",
-              border: "none",
-              background: "transparent",
-              color: "#295ea8",
-              fontSize: "28px",
-              fontWeight: 600,
-              letterSpacing: "2px",
-              textAlign: "left",
-              cursor: "pointer",
-              textShadow: "0 0 8px rgba(255,255,255,0.7)",
-            }}
-          >
-            {item.name}
-          </button>
-        ))}
-      </div>
+      <img src={avatar} alt="avatar" style={{
+        position: "fixed",
+        right: "40px",
+        top: "30px",
+        width: "90px",
+        height: "90px",
+        borderRadius: "50%",
+        border: "3px solid white",
+        boxShadow: "0 10px 30px rgba(0,0,0,.35)",
+        zIndex: 20
+      }} />
 
       {/* 音乐 */}
       <audio ref={audioRef} loop autoPlay>
         <source src={bgm} type="audio/mpeg" />
       </audio>
 
-      {/* 内容区域 */}
-      <div>{renderContent()}</div>
+      {/* 主内容 */}
+      {renderContent()}
     </div>
   );
 }
 
-// 样式常量
+// 样式
 const dialogueStyle = {
   position: "fixed",
   bottom: 20,
@@ -178,7 +166,7 @@ const dialogueStyle = {
   backdropFilter: "blur(8px)",
   boxShadow: "0 10px 30px rgba(0,0,0,.25)",
   cursor: "pointer",
-  zIndex: 30,
+  zIndex: 30
 };
 const nameStyle = { fontWeight: "bold", color: "#2563eb", marginBottom: 8 };
 const textStyle = { lineHeight: 1.7, fontSize: "16px" };
@@ -198,7 +186,7 @@ const placeholderStyle = {
   zIndex: 30,
   textAlign: "center",
   fontSize: "18px",
-  color: "#333",
+  color: "#333"
 };
 
 export default App;
