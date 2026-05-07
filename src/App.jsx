@@ -3,25 +3,29 @@ import avatar from "./assets/avatar.jpg";
 import bgm from "./assets/bgm.mp3";
 import bg from "./assets/cg.jpg";
 
-function App() {
-  const [currentPage, setCurrentPage] = useState("menu"); // menu/start/continue/etc
-  const [lineIndex, setLineIndex] = useState(0);
-  const audioRef = useRef(null);
-
-  const lines = [
-    { name: "亚托莉", text: "……这里，是海边吗？" },
+const scenes = {
+  start: [
+    { name: "亚托莉", text: "……这里，是海边吗？", bg: bg },
     { name: "夏生", text: "嗯，一个有点安静的地方。" },
     { name: "亚托莉", text: "海风很舒服呢。" },
     { name: "夏生", text: "欢迎来到我的主页。" },
     { name: "系统", text: "潮声轻轻响起，时间像慢了下来。" },
-  ];
+  ],
+};
+
+function App() {
+  const [currentPage, setCurrentPage] = useState("menu"); // menu/start/continue/etc
+  const [sceneIndex, setSceneIndex] = useState(0);
+  const audioRef = useRef(null);
 
   useEffect(() => {
     audioRef.current?.play().catch(() => {});
   }, []);
 
   const nextLine = () => {
-    if (lineIndex < lines.length - 1) setLineIndex(lineIndex + 1);
+    if (sceneIndex < (scenes.start.length - 1)) {
+      setSceneIndex(sceneIndex + 1);
+    }
   };
 
   const menuItems = [
@@ -46,7 +50,10 @@ function App() {
       {menuItems.map(item => (
         <button
           key={item.key}
-          onClick={() => setCurrentPage(item.key)}
+          onClick={() => {
+            if(item.key === "start") setSceneIndex(0);
+            setCurrentPage(item.key)
+          }}
           style={{
             width: "260px",
             fontSize: "32px",
@@ -68,19 +75,19 @@ function App() {
   );
 
   const renderContent = () => {
-    switch (currentPage) {
+    switch(currentPage) {
       case "start":
         return (
           <div onClick={nextLine} style={dialogueStyle}>
-            <div style={nameStyle}>{lines[lineIndex].name}</div>
-            <div style={textStyle}>{lines[lineIndex].text}</div>
+            <div style={nameStyle}>{scenes.start[sceneIndex].name}</div>
+            <div style={textStyle}>{scenes.start[sceneIndex].text}</div>
             <div style={hintStyle}>点击继续 ▶</div>
           </div>
         );
       case "continue":
-        return <div style={placeholderStyle}>存档界面（CONTINUE）</div>;
+        return <div style={placeholderStyle}>加载存档（CONTINUE）</div>;
       case "extra":
-        return <div style={placeholderStyle}>CG / EXTRA 内容</div>;
+        return <div style={placeholderStyle}>CG / EXTRA</div>;
       case "system":
         return <div style={placeholderStyle}>设置界面（SYSTEM）</div>;
       case "trueEnd":
@@ -90,30 +97,25 @@ function App() {
       default:
         return renderMenu();
     }
-  };
+  }
 
   return (
     <div style={{ width: "100vw", height: "100vh", overflow: "hidden" }}>
-      {/* 背景 */}
-      <div
-        style={{
-          position: "fixed",
-          inset: 0,
-          backgroundImage: `url(${bg})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          filter: "brightness(0.75) saturate(1.05)"
-        }}
-      />
-      <div
-        style={{
-          position: "fixed",
-          inset: 0,
-          background: "linear-gradient(to top, rgba(0,20,40,0.65), transparent)"
-        }}
-      />
+      <div style={{
+        position: "fixed",
+        inset: 0,
+        backgroundImage: `url(${bg})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        filter: "brightness(0.75) saturate(1.05)"
+      }} />
 
-      {/* Logo */}
+      <div style={{
+        position: "fixed",
+        inset: 0,
+        background: "linear-gradient(to top, rgba(0,20,40,0.65), transparent)"
+      }} />
+
       <div style={{
         position: "fixed",
         left: "120px",
@@ -128,7 +130,6 @@ function App() {
         <div style={{ fontSize: "20px", opacity: 0.9 }}>- My Dear Moments -</div>
       </div>
 
-      {/* Avatar */}
       <img src={avatar} alt="avatar" style={{
         position: "fixed",
         right: "40px",
@@ -141,12 +142,10 @@ function App() {
         zIndex: 20
       }} />
 
-      {/* 音乐 */}
       <audio ref={audioRef} loop autoPlay>
-        <source src={bgm} type="audio/mpeg" />
+        <source src={bgm} type="audio/mpeg"/>
       </audio>
 
-      {/* 主内容 */}
       {renderContent()}
     </div>
   );
