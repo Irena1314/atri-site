@@ -1,65 +1,72 @@
-import { useState } from "react";
-import avatar from "./assets/avatar.jpg";
-import bgm from "./assets/bgm.mp3";
-import bg from "./assets/cg.jpg";
+import { useState, useRef } from "react"; import { motion } from "framer-motion"; import avatar from "./assets/avatar.jpg"; import bgm from "./assets/bgm.mp3"; import bg from "./assets/cg.jpg";
 
-function App() {
-  const [index, setIndex] = useState(0);
+export default function App() { const [index, setIndex] = useState(0); const audioRef = useRef(null);
 
-    const lines = [
-        { name: "亚托莉", text: "……这里，是海边吗？" },
-            { name: "夏生", text: "嗯，一个有点安静的地方。" },
-                { name: "亚托莉", text: "海风很舒服呢。" },
-                    { name: "夏生", text: "........." },
-                        { name: "系统", text: "潮声轻轻响起，时间像慢了下来。" },
-                          ];
+const lines = [ { name: "亚托莉", text: "……这里，是海边吗？" }, { name: "夏生", text: ".........." }, { name: "亚托莉", text: "今天也要一起创造新的回忆吗？" }, ];
 
-                            const nextLine = () => {
-                                if (index < lines.length - 1) {
-                                      setIndex(index + 1);
-                                          }
-                                            };
+const nextLine = () => { if (index < lines.length - 1) setIndex(index + 1); };
 
-                                              return (
-                                                  <div style={{ width: "100vw", height: "100vh", overflow: "hidden" }}>
-                                                        <div
-                                                                style={{
-                                                                          position: "fixed",
-                                                                                    inset: 0,
-                                                                                              backgroundImage: `url(${bg})`,
-                                                                                                        backgroundSize: "cover",
-                                                                                                                  backgroundPosition: "center",
-                                                                                                                            filter: "brightness(0.75) saturate(1.05)",
-                                                                                                                                    }}
-                                                                                                                                          />
+return ( <div className="w-screen h-screen overflow-hidden relative text-white"> <img src={bg} className="absolute inset-0 w-full h-full object-cover brightness-75" /> <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 to-transparent" />
 
-                                                                                                                                                <div
-                                                                                                                                                        style={{
-                                                                                                                                                                  position: "fixed",
-                                                                                                                                                                            inset: 0,
-                                                                                                                                                                                      background:
-                                                                                                                                                                                                  "linear-gradient(to top, rgba(0,20,40,0.65), transparent)",
-                                                                                                                                                                                                          }}
-                                                                                                                                                                                                                />
+<motion.div
+    initial={{ opacity: 0, y: -30 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="absolute left-20 top-16 z-20"
+  >
+    <h1 className="text-6xl font-bold drop-shadow-lg">ATRI</h1>
+    <p className="text-xl opacity-90">My Dear Moments</p>
+  </motion.div>
 
-                                                                                                                                                                                                                      <div
-                                                                                                                                                                                                                              style={{
-                                                                                                                                                                                                                                        position: "fixed",
-                                                                                                                                                                                                                                                  left: "120px",
-                                                                                                                                                                                                                                                            top: "80px",
-                                                                                                                                                                                                                                                                      color: "white",
-                                                                                                                                                                                                                                                                                fontSize: "52px",
-                                                                                                                                                                                                                                                                                          fontWeight: "bold",
-                                                                                                                                                                                                                                                                                                    textShadow: "0 4px 20px rgba(255,255,255,0.35)",
-                                                                                                                                                                                                                                                                                                              zIndex: 20,
-                                                                                                                                                                                                                                                                                                                      }}
-                                                                                                                                                                                                                                                                                                                            >
-                                                                                                                                                                                                                                                                                                                                    ATRI
-                                                                                                                                                                                                                                                                                                                                            <div style={{ fontSize: "20px", opacity: 0.9 }}>
-                                                                                                                                                                                                                                                                                                                                                      - My Dear Moments -
-                                                                                                                                                                                                                                                                                                                                                              </div>
-                                                                                                                                                                                                                                                                                                                                                                    </div>
+  <img
+    src={avatar}
+    className="absolute right-8 top-8 w-24 h-24 rounded-full border-4 border-white shadow-2xl z-20"
+  />
 
+  <div className="absolute left-28 top-64 z-20 flex flex-col gap-3">
+    {["START", "LOAD", "SYSTEM", "EXTRA", "EXIT"].map((item) => (
+      <button
+        key={item}
+        className="text-3xl text-left tracking-widest hover:translate-x-3 transition-all hover:text-sky-300"
+      >
+        {item}
+      </button>
+    ))}
+  </div>
+
+  <button
+    onClick={() => audioRef.current?.play()}
+    className="absolute right-8 bottom-40 z-30 bg-white/70 text-slate-800 px-4 py-2 rounded-xl shadow-xl"
+  >
+    🎵 Play BGM
+  </button>
+  <audio ref={audioRef} loop>
+    <source src={bgm} type="audio/mpeg" />
+  </audio>
+
+  <motion.div
+    onClick={nextLine}
+    whileHover={{ scale: 1.01 }}
+    className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[85%] max-w-5xl bg-white/85 text-slate-800 rounded-2xl p-6 shadow-2xl cursor-pointer z-30"
+  >
+    <div className="text-blue-600 font-bold mb-2">{lines[index].name}</div>
+    <div className="leading-8">{lines[index].text}</div>
+    <div className="text-xs opacity-60 mt-3">点击继续 ▶</div>
+  </motion.div>
+
+  <div className="absolute inset-0 pointer-events-none overflow-hidden">
+    {Array.from({ length: 20 }).map((_, i) => (
+      <motion.div
+        key={i}
+        initial={{ y: -50, x: Math.random() * 1500, opacity: 0.7 }}
+        animate={{ y: 1000, rotate: 360 }}
+        transition={{ repeat: Infinity, duration: 10 + Math.random() * 10 }}
+        className="absolute w-3 h-3 bg-pink-200/60 rounded-full blur-sm"
+      />
+    ))}
+  </div>
+</div>
+
+); }
                                                                                                                                                                                                                                                                                                                                                                           <img
                                                                                                                                                                                                                                                                                                                                                                                   src={avatar}
                                                                                                                                                                                                                                                                                                                                                                                           alt="avatar"
